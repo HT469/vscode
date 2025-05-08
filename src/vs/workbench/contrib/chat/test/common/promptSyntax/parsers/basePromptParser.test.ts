@@ -30,7 +30,7 @@ import { ObjectStream } from '../../../../../../../editor/common/codecs/utils/ob
 import { assertReferencesEqual } from './textModelPromptParser.test.js';
 import { ExpectedReference } from '../testUtils/expectedReference.js';
 import { TTree } from '../../../../common/promptSyntax/utils/treeUtils.js';
-import { OpenFailed } from '../../../../common/promptFileReferenceErrors.js';
+import { OpenFailed, RecursiveReference } from '../../../../common/promptFileReferenceErrors.js';
 
 /**
  * TODO: @legomushroom
@@ -448,11 +448,13 @@ suite('BasePromptParser', function () {
 						'## Files',
 						'\t- this file #file:folder1/file3.prompt.md ',
 						'\t- also this [file4.prompt.md](./folder1/some-other-folder/file4.prompt.md) please!',
+						'\t- and [another link](../path/test.prompt.md) please!',
 						' ',
 					]),
 					[
 						new OpenFailed(URI.joinPath(promptFileUri, '../folder1/file3.prompt.md'), 'File not found.'),
 						TestObjectStream.fromStrings([]),
+						new RecursiveReference(promptFileUri, new Array(2).fill(promptFileUri.path)),
 					],
 				),
 			);
